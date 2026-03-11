@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python Demo</title>
+
+  <!-- Highlight.js (подсветка кода) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css"
+  />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/languages/python.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #0f1b2f;
+      --panel-top: #44698f;
+      --text: #d7e3f4;
+      --muted: #9eb6d6;
+      --border: #2d4769;
+      --btn: #1a2a44;
+      --btn-hover: #223557;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(1200px 700px at 20% 10%, #162846, var(--bg));
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .editor {
+      width: min(980px, 100%);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      background: var(--panel);
+    }
+
+    .editor__top {
+      height: 44px;
+      background: linear-gradient(180deg, #567ea7, var(--panel-top));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid #36577b;
+    }
+
+    .lang {
+      font-weight: 700;
+      letter-spacing: .5px;
+      color: #eaf3ff;
+      font-size: 15px;
+    }
+
+    .copy-btn {
+      border: 1px solid #7da0c8;
+      background: rgba(16, 31, 54, 0.45);
+      color: #dbe9fb;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: .2s;
+    }
+    .copy-btn:hover { background: rgba(16, 31, 54, 0.75); }
+
+    pre {
+      margin: 0;
+      padding: 18px 22px 22px;
+      overflow-y: auto;      /* вертикальная прокрутка при необходимости */
+      overflow-x: hidden;    /* убираем горизонтальную прокрутку */
+      background: #0b1323 !important;
+      font: 500 19px/1.58 "Consolas", "Courier New", monospace;
+      tab-size: 4;
+
+      white-space: pre-wrap; /* перенос строк */
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    code {
+      color: #d7e3f4;
+      white-space: inherit;  /* наследуем перенос от pre */
+    }
+
+    .hint {
+      margin-top: 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <section class="editor">
+    <header class="editor__top">
+      <span class="lang">py</span>
+      <button class="copy-btn" id="copyBtn">Копировать</button>
+    </header>
+
+    <pre><code id="code" class="language-python">def main():
+    filename = input("Введите имя файла для анализа: ").strip()
+
+    file = None
+    total_lines = 0
+    valid_count = 0
+    error_count = 0
+    bad_lines = []
+
+    best_time = None
+    best_runner = None  # (full_name, country, time)
+
+    try:
+        file = open(filename, "r", encoding="utf-8")
+
+        for line_num, raw_line in enumerate(file, start=1):
+            total_lines += 1
+            line = raw_line.strip()
+
+            # Пустые строки считаем ошибкой формата
+            if not line:
+                error_count += 1
+                bad_lines.append((line_num, raw_line.rstrip("\n")))
+                continue
+
+            try:
+                parts = [p.strip() for p in line.split(",")]
+
+                # Неверное количество полей -> ошибка формата
+                if len(parts) != 3:
+                    raise IndexError("Неверное количество полей")
+
+                full_name = parts[0]
+                country = parts[1]
+                time_sec = float(parts[2])  # ValueError, если не число
+
+                valid_count += 1
+
+                if best_time is None or time_sec < best_time:
+                    best_time = time_sec
+                    best_runner = (full_name, country, time_sec)
+
+            except IndexError:
+                error_count += 1
+                bad_lines.append((line_num, raw_line.rstrip("\n")))
+            except ValueError:
+                error_count += 1
+                bad_lines.append((line_num, raw_line.rstrip("\n")))
+
+    except FileNotFoundError:
+        print(f"Ошибка: файл '{filename}' не найден.")
+        return
+    except OSError as e:  # Аналог IOException в Python
+        print(f"Ошибка ввода-вывода при работе с файлом '{filename}': {e}")
+        return
+    finally:
+        if file is not None:
+            file.close()
+
+    # Вывод результатов
+    print("\n--- Результаты анализа ---")
+    if best_runner is not None:
+        print(
+            f"Лучший результат: {best_runner[0]} ({best_runner[1]}) - {best_runner[2]:.3f} сек."
+        )
+    else:
+        print("Лучший результат не найден (нет корректных записей).")
+
+    print(f"Всего строк обработано: {total_lines}")
+    print(f"Корректных записей: {valid_count}")
+    print(f"Записей с ошибками: {error_count}")
+
+    if bad_lines:
+        print("\nСтроки, которые не удалось обработать:")
+        for num, content in bad_lines:
+            print(f"{num}: {content}")
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+  </section>
+
+  <div class="hint">Откройте файл в браузере: двойной клик по <b>1.html</b></div>
+
+  <script>
+    hljs.highlightAll();
+
+    const copyBtn = document.getElementById("copyBtn");
+    const codeEl = document.getElementById("code");
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(codeEl.innerText);
+        copyBtn.textContent = "Скопировано";
+        setTimeout(() => (copyBtn.textContent = "Копировать"), 1200);
+      } catch {
+        copyBtn.textContent = "Ошибка";
+        setTimeout(() => (copyBtn.textContent = "Копировать"), 1200);
+      }
+    });
+  </script>
+</body>
+</html>
