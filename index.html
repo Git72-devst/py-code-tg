@@ -110,13 +110,16 @@
     </header>
 
     <pre><code id="code" class="language-python">try:
-    data = [1, 2, 3]
-    index = int(input("Введите индекс: "))
-    print(data[index])
-except (IndexError, ValueError) as e:
-    print(f"Произошла ошибка ввода или индекса: {e}")
-except Exception as e:
-    print(f"Неожиданная ошибка: {e}")
+    file = open("data.txt", "r")
+    content = file.read()
+except FileNotFoundError:
+    print("Файл не найден")
+else:
+    print("Файл успешно прочитан")
+    print(content)
+finally:
+    print("Операция завершена")
+    file.close()
 </code></pre>
   </section>
 
