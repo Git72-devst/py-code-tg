@@ -109,28 +109,94 @@
       <button class="copy-btn" id="copyBtn">Копировать</button>
     </header>
 
-    <pre><code id="code" class="language-python">def set_age(age):
- if age < 0 or age > 150:
- raise ValueError(f"Некорректный возраст: {age}")
- print(f"Возраст установлен: {age}")
+    <pre><code id="code" class="language-python">def calculator():
+    """Основная функция калькулятора"""
+    
+    print("=" * 50)
+    print("         КАЛЬКУЛЯТОР")
+    print("=" * 50)
+    
+    while True:
+        print("\n--- Новое вычисление ---")
+        
+        # Блок try для обработки возможных ошибок
+        try:
+            # Ввод первого числа с защитой от ValueError
+            while True:
+                try:
+                    num1 = float(input("Введите первое число: "))
+                    break  # Выходим из цикла, если ввод корректен
+                except ValueError:
+                    print("Ошибка: Введите число, а не текст!")
+                    print("   Попробуйте снова...\n")
+            
+            # Ввод второго числа
+            while True:
+                try:
+                    num2 = float(input("Введите второе число: "))
+                    break
+                except ValueError:
+                    print("Ошибка: Введите число, а не текст!")
+                    print("   Попробуйте снова...\n")
+            
+            # Ввод операции
+            operation = input("Выберите операцию (+, -, *, /): ").strip()
+            
+            # Выполнение вычисления в зависимости от операции
+            # Блок else будет выполнен только если не возникло исключений
+            if operation == '+':
+                result = num1 + num2
+                operation_symbol = '+'
+            elif operation == '-':
+                result = num1 - num2
+                operation_symbol = '-'
+            elif operation == '*':
+                result = num1 * num2
+                operation_symbol = '*'
+            elif operation == '/':
+                # Проверка деления на ноль вызовет ZeroDivisionError
+                result = num1 / num2
+                operation_symbol = '/'
+            else:
+                # Если операция неизвестна, выбрасываем исключение
+                raise ValueError(f"Неизвестная операция: '{operation}'. Используйте +, -, *, /")
+            
+        except ZeroDivisionError:
+            # Обработка деления на ноль
+            print("\nОшибка: Деление на ноль невозможно!")
+            print("   Математика говорит, что на ноль делить нельзя.")
+            continue  # Перезапускаем цикл для нового вычисления
+            
+        except ValueError as e:
+            # Обработка ошибки ввода операции
+            print(f"\nОшибка: {e}")
+            continue  # Перезапускаем цикл
+            
+        else:
+            # Блок else выполняется только если не было исключений
+            print("\n" + "=" * 50)
+            print(f"Результат: {num1} {operation_symbol} {num2} = {result}")
+            print("=" * 50)
+            
+        finally:
+            # Блок finally выполняется ВСЕГДА (и при успехе, и при ошибке)
+            print("\nСпасибо за использование калькулятора!")
+            
+            # Спрашиваем, хочет ли пользователь продолжить
+            while True:
+                choice = input("\nХотите выполнить еще одно вычисление? (да/нет): ").strip().lower()
+                if choice in ['да', 'нет', 'yes', 'no', 'y', 'n']:
+                    break
+                print("Пожалуйста, введите 'да' или 'нет'")
+            
+            if choice in ['нет', 'no', 'n']:
+                print("\nДо свидания! Возвращайтесь еще.")
+                return  # Выходим из функции и завершаем программу
+            # Если выбрано 'да', цикл while True продолжит работу
 
-try:
- set_age(-5)
-except ValueError as e:
- print(f"Ошибка валидации: {e}")
 
-class InsufficientFundsError(Exception):
- """Исключение, возникающее при недостатке средств на счете."""
- pass
-
-class BankAccount:
- def __init__(self, balance):
- self.balance = balance
- def withdraw(self, amount):
- if amount > self.balance:
- raise InsufficientFundsError(f"Недостаточно средств. Доступно: {self.balance}")
- self.balance -= amount
-</code></pre>
+if __name__ == "__main__":
+    calculator()</code></pre>
   </section>
 
   <div class="hint"><b>©LIQLART86</b></div>
