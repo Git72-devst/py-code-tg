@@ -109,17 +109,27 @@
       <button class="copy-btn" id="copyBtn">Копировать</button>
     </header>
 
-    <pre><code id="code" class="language-python">try:
-    file = open("data.txt", "r")
-    content = file.read()
-except FileNotFoundError:
-    print("Файл не найден")
-else:
-    print("Файл успешно прочитан")
-    print(content)
-finally:
-    print("Операция завершена")
-    file.close()
+    <pre><code id="code" class="language-python">def set_age(age):
+ if age < 0 or age > 150:
+ raise ValueError(f"Некорректный возраст: {age}")
+ print(f"Возраст установлен: {age}")
+
+try:
+ set_age(-5)
+except ValueError as e:
+ print(f"Ошибка валидации: {e}")
+
+class InsufficientFundsError(Exception):
+ """Исключение, возникающее при недостатке средств на счете."""
+ pass
+
+class BankAccount:
+ def __init__(self, balance):
+ self.balance = balance
+ def withdraw(self, amount):
+ if amount > self.balance:
+ raise InsufficientFundsError(f"Недостаточно средств. Доступно: {self.balance}")
+ self.balance -= amount
 </code></pre>
   </section>
 
