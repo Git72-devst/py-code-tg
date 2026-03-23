@@ -110,13 +110,13 @@
     </header>
 
     <pre><code id="code" class="language-python">try:
-    number = int(input("Введите число: "))
-    result = 100 / number
-    print(f"Результат: {result}")
-except ValueError:
-    print("Ошибка: Введено не число!")
-except ZeroDivisionError:
-    print("Ошибка: Делить на ноль нельзя!")
+    data = [1, 2, 3]
+    index = int(input("Введите индекс: "))
+    print(data[index])
+except (IndexError, ValueError) as e:
+    print(f"Произошла ошибка ввода или индекса: {e}")
+except Exception as e:
+    print(f"Неожиданная ошибка: {e}")
 </code></pre>
   </section>
 
