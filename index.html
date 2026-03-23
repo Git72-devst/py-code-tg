@@ -109,86 +109,94 @@
       <button class="copy-btn" id="copyBtn">Копировать</button>
     </header>
 
-    <pre><code id="code" class="language-python">def main():
-    filename = input("Введите имя файла для анализа: ").strip()
-
-    file = None
-    total_lines = 0
-    valid_count = 0
-    error_count = 0
-    bad_lines = []
-
-    best_time = None
-    best_runner = None  # (full_name, country, time)
-
-    try:
-        file = open(filename, "r", encoding="utf-8")
-
-        for line_num, raw_line in enumerate(file, start=1):
-            total_lines += 1
-            line = raw_line.strip()
-
-            # Пустые строки считаем ошибкой формата
-            if not line:
-                error_count += 1
-                bad_lines.append((line_num, raw_line.rstrip("\n")))
-                continue
-
-            try:
-                parts = [p.strip() for p in line.split(",")]
-
-                # Неверное количество полей -> ошибка формата
-                if len(parts) != 3:
-                    raise IndexError("Неверное количество полей")
-
-                full_name = parts[0]
-                country = parts[1]
-                time_sec = float(parts[2])  # ValueError, если не число
-
-                valid_count += 1
-
-                if best_time is None or time_sec < best_time:
-                    best_time = time_sec
-                    best_runner = (full_name, country, time_sec)
-
-            except IndexError:
-                error_count += 1
-                bad_lines.append((line_num, raw_line.rstrip("\n")))
-            except ValueError:
-                error_count += 1
-                bad_lines.append((line_num, raw_line.rstrip("\n")))
-
-    except FileNotFoundError:
-        print(f"Ошибка: файл '{filename}' не найден.")
-        return
-    except OSError as e:  # Аналог IOException в Python
-        print(f"Ошибка ввода-вывода при работе с файлом '{filename}': {e}")
-        return
-    finally:
-        if file is not None:
-            file.close()
-
-    # Вывод результатов
-    print("\n--- Результаты анализа ---")
-    if best_runner is not None:
-        print(
-            f"Лучший результат: {best_runner[0]} ({best_runner[1]}) - {best_runner[2]:.3f} сек."
-        )
-    else:
-        print("Лучший результат не найден (нет корректных записей).")
-
-    print(f"Всего строк обработано: {total_lines}")
-    print(f"Корректных записей: {valid_count}")
-    print(f"Записей с ошибками: {error_count}")
-
-    if bad_lines:
-        print("\nСтроки, которые не удалось обработать:")
-        for num, content in bad_lines:
-            print(f"{num}: {content}")
+    <pre><code id="code" class="language-python">def calculator():
+    """Основная функция калькулятора"""
+    
+    print("=" * 50)
+    print("         КАЛЬКУЛЯТОР")
+    print("=" * 50)
+    
+    while True:
+        print("\n--- Новое вычисление ---")
+        
+        # Блок try для обработки возможных ошибок
+        try:
+            # Ввод первого числа с защитой от ValueError
+            while True:
+                try:
+                    num1 = float(input("Введите первое число: "))
+                    break  # Выходим из цикла, если ввод корректен
+                except ValueError:
+                    print("Ошибка: Введите число, а не текст!")
+                    print("   Попробуйте снова...\n")
+            
+            # Ввод второго числа
+            while True:
+                try:
+                    num2 = float(input("Введите второе число: "))
+                    break
+                except ValueError:
+                    print("Ошибка: Введите число, а не текст!")
+                    print("   Попробуйте снова...\n")
+            
+            # Ввод операции
+            operation = input("Выберите операцию (+, -, *, /): ").strip()
+            
+            # Выполнение вычисления в зависимости от операции
+            # Блок else будет выполнен только если не возникло исключений
+            if operation == '+':
+                result = num1 + num2
+                operation_symbol = '+'
+            elif operation == '-':
+                result = num1 - num2
+                operation_symbol = '-'
+            elif operation == '*':
+                result = num1 * num2
+                operation_symbol = '*'
+            elif operation == '/':
+                # Проверка деления на ноль вызовет ZeroDivisionError
+                result = num1 / num2
+                operation_symbol = '/'
+            else:
+                # Если операция неизвестна, выбрасываем исключение
+                raise ValueError(f"Неизвестная операция: '{operation}'. Используйте +, -, *, /")
+            
+        except ZeroDivisionError:
+            # Обработка деления на ноль
+            print("\nОшибка: Деление на ноль невозможно!")
+            print("   Математика говорит, что на ноль делить нельзя.")
+            continue  # Перезапускаем цикл для нового вычисления
+            
+        except ValueError as e:
+            # Обработка ошибки ввода операции
+            print(f"\nОшибка: {e}")
+            continue  # Перезапускаем цикл
+            
+        else:
+            # Блок else выполняется только если не было исключений
+            print("\n" + "=" * 50)
+            print(f"Результат: {num1} {operation_symbol} {num2} = {result}")
+            print("=" * 50)
+            
+        finally:
+            # Блок finally выполняется ВСЕГДА (и при успехе, и при ошибке)
+            print("\nСпасибо за использование калькулятора!")
+            
+            # Спрашиваем, хочет ли пользователь продолжить
+            while True:
+                choice = input("\nХотите выполнить еще одно вычисление? (да/нет): ").strip().lower()
+                if choice in ['да', 'нет', 'yes', 'no', 'y', 'n']:
+                    break
+                print("Пожалуйста, введите 'да' или 'нет'")
+            
+            if choice in ['нет', 'no', 'n']:
+                print("\nДо свидания! Возвращайтесь еще.")
+                return  # Выходим из функции и завершаем программу
+            # Если выбрано 'да', цикл while True продолжит работу
 
 
 if __name__ == "__main__":
-    main()</code></pre>
+    calculator()</code></pre>
   </section>
 
   <div class="hint"><b>©LIQLART86</b></div>
